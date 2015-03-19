@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 var debug = require('debug')('my-application');
+var portfinder = require('portfinder');
 var app = require('../app');
-
-app.set('port', process.env.PORT || 3000);
-
+portfinder.getPort(function (err, port) {
+app.set('port', process.env.PORT || port);
 var server = app.listen(app.get('port'), function() {
-  debug('Express server listening on port ' + server.address().port);
+console.log(port);
+debug('Express server listening on port ' + server.address().port);
 });
+});
+
+
+
