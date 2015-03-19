@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/cliente', function(req, res) {
+router.get('/', function(req, res) {
   res.render('cliente/buscar', { title: 'aqui vemos las salas disponibles' });
 });
 
-router.get('/cliente:sala', function(req, res) {
-  res.render('cliente/juego', { title: 'esto es un juego' });
+router.get('/:sala', function(req, res) {
+	var salaid = req.params.sala;
+  	res.render('cliente/juego', { title: salaid });
 });
 
 module.exports = router;
