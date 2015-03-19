@@ -1,0 +1,54 @@
+
+Servidor:
+- Escucha peticiones de juego de cualquier cliente. (TCP)
+- Valida la conexión con el cliente, le asigna un identificador de jugador
+- Recibe el carton del cliente, lo registra y le asigna un identificador de carton
+- Emite los números para la jugada cada intérvalo fijo de tiempo.
+- Inicia/Finaliza la jugada.
+- Monitorea las peticiones del cliente: Bingo, ingresar al juego, salir del juego.  
+- Invalida un carton por: carton repetido (casi imposible), alguna otra razón?
+- Validar el mensaje de Bingo del cliente, verifica si los numeros y el carton son correctos. 
+ 
+
+Cliente:
+- Genera los cartones para jugar (automático), el cliente elige con cuantos de estos va a jugar.
+- Solicita ingresar/salir del servidor. 
+- Solicita validación de los cartones por parte del servidor, si estan repetidos y les asigna un identificador. 
+- Revisa el número emitido por el servidor en los cartones en juego (automático)
+- Envía el mensaje al servidor cantando Bingo, según las formas definidas (carton lleno, lineas, dos líneas, cruz... etc)
+- Notificar al servidor la recepción del número de la jugada, asignación de identificador de jugador y cartones. 
+
+
+Igualmente los cartones definitivamente los genera el cliente, Hay que aligerarle algo al servidor no? Para ver si esta repetido o no el carton se puede hacer un cálculo hash (con un algoritmo md5 por ejemplo) de los numeros de un carton, si ese numero calculado es igual a otros que este en el servidor, se le indica al cliente que genere otro carton... Claro la probabilidad de dos cartones iguales es casi infinitamente nula. Sin embargo es un mecanismo de verificación interesante y fácil de implementar.
+
+Estoy de acuerdo que los clientes no se comunican entre ellos. Solo es Cliente <--> Servidor.
+
+
+Tengan cuidado con el formato de los mensajes y los separadores, sugiero lo diseñen en función de un tamaño fijo, en este punto no importa si se desperdicia algún espacio o algunos campos..
+Espero sus comentarios...
+Buenas noches,
+
+- Una verificación de la autenticidad del jugador, así como cantar los números como un broadcast. Esta idea esta bastante buena. Una vez que los mensajes lleguen a todos los jugadores, ellos responden con un mensaje identificado por un número, donde le diga al servidor que ya tiene el número que cantado.
+
+- Deben definir ya los campos que va a manejar ese protocolo (Fijense en la estructura de los protocolos que hemos visto IP, UDP, ICMP... por esa línea va el diseño final)
+
+- Condideren todos los elementos que han comentado en los otros hilos, es el insumo fundamental para generar la descripción de todo el protocolo.
+
+Me parece excelente la propuesta de Heleny, en esa línea terminen de desarrollar la propuesta de los códigos a intercambiar, estamos muy gerenciales en las observaciones y, en este punto, debemos ser mas operativos.
+
+Por favor para mañana terminen de definir los códigos y los tipos de mensajes que se van a intercambiar, así como tambien el diseño del datagrama.
+
+- Para validar el carton el servidor tiene un id del carton + el usuario al que pertenece + los números que transmitió el cliente en ese momento. En caso de cantar bingo, ya el servidor sabe el carton, enonces el cliente cantará bingo y deberá decir en cual carton, el servidor lo revisa y valida que realmente sea un mensaje válido. Si no lo es, el servidor puede enviarle un mensaje al cliente diciendo que es inválido y se tomaran las acciones necesarias (Ej: Anular ese carton a manera de penalizacion por ejemplo, o sencillamente se ignora y se sigue la jugada)
+
+- Para verificar la integridad del carton, se puede calcular un numero hash y se guarda como identificador del carton, esto agregaria un mecanismo adicional de seguridad/intergridad a la jugada.. Esto es una sugerencia, revisenla a ver que tal.
+
+
+Reglas:
+- Aplicacion Cliente / Servidor.
+- Cliente genera carton.
+- Validacion de carton en MD5.
+- Maximo de 5 cartones por cliente.
+- 5 segundos entre canto de numeros.
+- Puerto a usar TCP 10022.
+- Puerto a usar UDP 10022.
+- JSON para codificacion y decodificaion de mensajes.
